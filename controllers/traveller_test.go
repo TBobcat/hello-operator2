@@ -11,6 +11,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/envtest"
 
 	appsv1 "k8s.io/api/apps/v1"
 
@@ -20,12 +21,13 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 	//ctrl "sigs.k8s.io/controller-runtime"
-	//mydomainv1alpha1 "my.domain/hello-operator2/api/v1alpha1"
+	mydomainv1alpha1 "my.domain/hello-operator2/api/v1alpha1"
 )
 
 var (
 	cfg       *rest.Config
 	k8sClient client.Client
+	testEnv   *envtest.Environment
 )
 
 // +kubebuilder:docs-gen:collapse=Imports
@@ -38,6 +40,12 @@ var _ = Describe("Arcade Controller", func() {
 		interval              = time.Millisecond * 250
 	)
 
+	useCluster := true
+	testEnv = &envtest.Environment{
+		UseExistingCluster:       &useCluster,
+		AttachControlPlaneOutput: true,
+	}
+
 	ctx := context.Background()
 	var err error
 
@@ -47,7 +55,18 @@ var _ = Describe("Arcade Controller", func() {
 	Expect(k8sClient).ToNot(BeNil())
 
 	key := types.NamespacedName{Name: ArcadeName, Namespace: ArcadeNamespace}
-	//createdArcade := &mydomainv1alpha1.Traveller{}
+
+	createdArcade := &mydomainv1alpha1.Traveller{}
+	Eventually(func() bool {
+		err := k8sClient.Get(ctx, key, createdArcade)
+		if err != nil {
+			return false
+		}
+		return true
+	}, timeout, interval).Should(BeTrue())
+
+	Expect(createdArcade.Name).To(Equal(ArcadeName))
+	Expect(createdArcade.Namespace).To(Equal(ArcadeNamespace))
 
 	By("Verify deployment was created")
 	dep := &appsv1.Deployment{}
