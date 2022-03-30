@@ -7,22 +7,53 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	routev1 "github.com/openshift/api/route/v1"
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-	intstr "k8s.io/apimachinery/pkg/util/intstr"
-	ctrl "sigs.k8s.io/controller-runtime"
 
+	"k8s.io/client-go/kubernetes/scheme"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	appsv1 "k8s.io/api/apps/v1"
+
+	// corev1 "k8s.io/api/core/v1"
+	// metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	//intstr "k8s.io/apimachinery/pkg/util/intstr"
+
+	"k8s.io/apimachinery/pkg/types"
+	//ctrl "sigs.k8s.io/controller-runtime"
+	
 	mydomainv1alpha1 "my.domain/hello-operator2/api/v1alpha1"
 )
 
+k8sManager, err = ctrl.NewManager(cfg, ctrl.Options{
+	Scheme:             scheme.Scheme,
+	MetricsBindAddress: metricsAddr,
+  })
+k8sManager.Start(ctrl.SetupSignalHandler())
+k8sClient = k8sManager.GetClient()
+
 // +kubebuilder:docs-gen:collapse=Imports
 var _ = Describe("Arcade Controller", func() {
+	const (
+		ArcadeName            = "test-traveller"
+		ArcadeNamespace       = "default"
+		ArcadePort      int32 = 8080
+		timeout               = time.Second * 10
+		interval              = time.Millisecond * 250
+	)
+
 	ctx := context.Background()
+	var err error
+
+	// Create client for testing
+	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
+	Expect(err).ToNot(HaveOccurred())
+	Expect(k8sClient).ToNot(BeNil())
+
+	key := types.NamespacedName{Name: ArcadeName, Namespace: ArcadeNamespace}
+	//createdArcade := &mydomainv1alpha1.Traveller{}
+
 	By("Verify deployment was created")
 	dep := &appsv1.Deployment{}
+
 	Eventually(func() bool {
 		err := k8sClient.Get(ctx, key, dep)
 		if err != nil {
