@@ -93,5 +93,3 @@ func (r *TravellerReconciler) backendDeployment(v *mydomainv1alpha1.Traveller) *
 	controllerutil.SetControllerReference(v, dep, r.Scheme)
 	return dep
 }
-
- 

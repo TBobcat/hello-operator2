@@ -1,0 +1,4 @@
+# add this file to group handle .yamls using kustomize
+resources:
+- _v1alpha1_traveller.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples
