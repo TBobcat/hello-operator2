@@ -68,17 +68,22 @@ var _ = Describe("Arcade Controller", func() {
 	Expect(createdArcade.Name).To(Equal(ArcadeName))
 	Expect(createdArcade.Namespace).To(Equal(ArcadeNamespace))
 
-	By("Verify deployment was created")
-	dep := &appsv1.Deployment{}
+	Context("TESTINGGGG", func() {
+		It("Should successfully deploy traveller", func() {
+			By("Verify deployment was created")
+			dep := &appsv1.Deployment{}
 
-	Eventually(func() bool {
-		err := k8sClient.Get(ctx, key, dep)
-		if err != nil {
-			return false
-		}
-		return true
-	}, timeout, interval).Should(BeTrue())
-	Expect(dep.Spec.Template.Spec.Containers[0].Name).To(Equal("arcade"))
-	Expect(dep.Spec.Template.Spec.Containers[0].Image).To(ContainSubstring("arcade"))
+			Eventually(func() bool {
+				err := k8sClient.Get(ctx, key, dep)
+				if err != nil {
+					return false
+				}
+				return true
+			}, timeout, interval).Should(BeTrue())
+			Expect(dep.Spec.Template.Spec.Containers[0].Name).To(Equal("arcade"))
+			Expect(dep.Spec.Template.Spec.Containers[0].Image).To(ContainSubstring("arcade"))
+		})
+
+	})
 
 })
