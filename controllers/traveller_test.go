@@ -9,6 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -19,16 +20,13 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 	//ctrl "sigs.k8s.io/controller-runtime"
-	
-	mydomainv1alpha1 "my.domain/hello-operator2/api/v1alpha1"
+	//mydomainv1alpha1 "my.domain/hello-operator2/api/v1alpha1"
 )
 
-k8sManager, err = ctrl.NewManager(cfg, ctrl.Options{
-	Scheme:             scheme.Scheme,
-	MetricsBindAddress: metricsAddr,
-  })
-k8sManager.Start(ctrl.SetupSignalHandler())
-k8sClient = k8sManager.GetClient()
+var (
+	cfg       *rest.Config
+	k8sClient client.Client
+)
 
 // +kubebuilder:docs-gen:collapse=Imports
 var _ = Describe("Arcade Controller", func() {
