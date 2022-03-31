@@ -3,5 +3,5 @@ kind: Traveller
 metadata:
   name: traveller-sample
 spec:
-  foo: bar
+  foo: new_value
   # TODO(user): Add fields here
